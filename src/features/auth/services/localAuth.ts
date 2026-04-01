@@ -1,0 +1,92 @@
+import * as LocalAuthentication from 'expo-local-authentication';
+
+export type LocalAuthFailureReason =
+  | 'no-hardware'
+  | 'not-enrolled'
+  | 'cancelled'
+  | 'failed'
+  | 'error';
+
+export type LocalAuthResult =
+  | { success: true }
+  | {
+      success: false;
+      reason: LocalAuthFailureReason;
+      message: string;
+    };
+
+function getFailureMessage(reason: LocalAuthFailureReason): string {
+  switch (reason) {
+    case 'no-hardware':
+      return 'Biometric authentication is not available on this device.';
+    case 'not-enrolled':
+      return 'No biometric credentials are enrolled on this device.';
+    case 'cancelled':
+      return 'Authentication was cancelled.';
+    case 'failed':
+      return 'Authentication failed. Please try again.';
+    case 'error':
+    default:
+      return 'Something went wrong while checking biometrics.';
+  }
+}
+
+export async function requireBiometricAuth(
+  promptMessage: string,
+): Promise<LocalAuthResult> {
+  try {
+    const hasHardware = await LocalAuthentication.hasHardwareAsync();
+
+    if (!hasHardware) {
+      return {
+        success: false,
+        reason: 'no-hardware',
+        message: getFailureMessage('no-hardware'),
+      };
+    }
+
+    const isEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+    if (!isEnrolled) {
+      return {
+        success: false,
+        reason: 'not-enrolled',
+        message: getFailureMessage('not-enrolled'),
+      };
+    }
+
+    const result = await LocalAuthentication.authenticateAsync({
+      promptMessage,
+      promptSubtitle: 'Confirm your identity',
+      cancelLabel: 'Cancel',
+      disableDeviceFallback: false,
+      biometricsSecurityLevel: 'strong',
+    });
+
+    if (result.success) {
+      return { success: true };
+    }
+
+    const cancelErrors = new Set([
+      'user_cancel',
+      'system_cancel',
+      'app_cancel',
+    ]);
+
+    const reason: LocalAuthFailureReason = cancelErrors.has(result.error)
+      ? 'cancelled'
+      : 'failed';
+
+    return {
+      success: false,
+      reason,
+      message: getFailureMessage(reason),
+    };
+  } catch {
+    return {
+      success: false,
+      reason: 'error',
+      message: getFailureMessage('error'),
+    };
+  }
+}
