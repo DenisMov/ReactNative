@@ -13,7 +13,7 @@ export function Screen({ children }: ScreenProps): React.JSX.Element {
       <StatusBar barStyle="dark-content" />
       <KeyboardAvoidingView
         style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
         <View style={[styles.content]}>{children}</View>
       </KeyboardAvoidingView>

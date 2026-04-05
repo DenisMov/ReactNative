@@ -42,6 +42,9 @@ export const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.errorActionBorder,
   },
+  list: {
+    flex: 1,
+  },
   errorActionText: {
     ...typography.captionBold,
     color: colors.dangerText,

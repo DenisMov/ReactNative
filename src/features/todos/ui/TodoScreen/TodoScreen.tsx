@@ -96,10 +96,11 @@ export function TodoScreen(): React.JSX.Element {
           </View>
         ) : (
           <FlatList
+            style={styles.list}
             data={items}
             keyExtractor={item => item.id}
             contentContainerStyle={styles.listContent}
-            showsVerticalScrollIndicator={false}
+            keyboardShouldPersistTaps="handled"
             renderItem={({ item }) => (
               <TodoItem
                 todo={item}

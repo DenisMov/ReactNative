@@ -14,7 +14,9 @@ function isTodo(value: unknown): value is Todo {
     typeof candidate.title === 'string' &&
     typeof candidate.completed === 'boolean' &&
     typeof candidate.createdAt === 'string' &&
-    typeof candidate.updatedAt === 'string'
+    (typeof candidate.updatedAt === 'string' || candidate.updatedAt === null) &&
+    (typeof candidate.completedAt === 'string' ||
+      candidate.completedAt === null)
   );
 }
 

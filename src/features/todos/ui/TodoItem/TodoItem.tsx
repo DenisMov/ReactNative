@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Pressable, Text, TextInput, View } from 'react-native';
+import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
 import { Todo } from '../../model/types';
 import { formatDisplayDate } from '../../../../shared/utils/date';
 import { getTodoDisplayMeta } from '../../../../shared/utils/todoMeta';
@@ -31,13 +31,14 @@ export function TodoItem({
     const trimmedTitle = draftTitle.trim();
 
     if (!trimmedTitle) {
-      setLocalError(t('emptyTitleError'));
+      setLocalError(t('errors.emptyTitle'));
       return;
     }
 
     const wasUpdated = await onSave(todo.id, trimmedTitle);
 
     if (wasUpdated) {
+      Keyboard.dismiss();
       setIsEditing(false);
       setLocalError(null);
     }
@@ -81,9 +82,14 @@ export function TodoItem({
               }
             }}
             editable={!disabled}
+            autoFocus
             style={styles.input}
             autoCorrect={false}
             autoCapitalize="sentences"
+            returnKeyType="done"
+            onSubmitEditing={() => {
+              void handleSave();
+            }}
           />
 
           {localError ? (
@@ -109,6 +115,7 @@ export function TodoItem({
             <Pressable
               testID={`todo-cancel-${todo.id}`}
               onPress={() => {
+                Keyboard.dismiss();
                 setDraftTitle(todo.title);
                 setLocalError(null);
                 setIsEditing(false);
