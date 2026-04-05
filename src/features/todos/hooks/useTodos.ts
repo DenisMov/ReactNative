@@ -59,6 +59,11 @@ export function useTodos(): UseTodosResult {
     void reload();
   }, [reload]);
 
+  /**
+   * Wraps actions with biometric authentication.
+   * Handles loading state, errors and auth result normalization.
+   */
+
   const runProtectedAction = useCallback(
     async (
       promptMessage: string,
@@ -90,6 +95,7 @@ export function useTodos(): UseTodosResult {
     [],
   );
 
+  // Creates a new todo after successful biometric auth
   const addTodo = useCallback(
     async (title: string): Promise<boolean> => {
       const trimmedTitle = title.trim();
@@ -122,6 +128,7 @@ export function useTodos(): UseTodosResult {
     [persistAndDispatch, runProtectedAction, state.items],
   );
 
+  // Persist updated todos to storage and sync reducer state
   const updateTodo = useCallback(
     async (id: string, title: string): Promise<boolean> => {
       const trimmedTitle = title.trim();

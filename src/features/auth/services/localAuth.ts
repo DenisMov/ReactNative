@@ -31,6 +31,10 @@ function getFailureMessage(reason: LocalAuthFailureReason): string {
   }
 }
 
+/**
+ * Requests biometric authentication from the user.
+ * Handles all edge cases: unsupported device, not enrolled, cancellation and failures.
+ */
 export async function requireBiometricAuth(
   promptMessage: string,
 ): Promise<LocalAuthResult> {
@@ -67,6 +71,7 @@ export async function requireBiometricAuth(
       return { success: true };
     }
 
+    // Expo returns multiple cancel-related error codes — normalize them
     const cancelErrors = new Set([
       'user_cancel',
       'system_cancel',
@@ -83,6 +88,7 @@ export async function requireBiometricAuth(
       message: getFailureMessage(reason),
     };
   } catch {
+    // Fallback for unexpected errors (SDK issues, runtime exceptions, etc.)
     return {
       success: false,
       reason: 'error',

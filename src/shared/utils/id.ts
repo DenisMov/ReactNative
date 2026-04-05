@@ -1,3 +1,6 @@
+import 'react-native-get-random-values';
+import { v4 as uuid } from 'uuid';
+
 export function generateId(): string {
-  return `${Date.now()}-${Math.random().toString(36).slice(2, 10)}`;
+  return uuid();
 }
