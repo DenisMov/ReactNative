@@ -10,6 +10,7 @@ const baseTodo: Todo = {
   completed: false,
   createdAt: '2026-04-01T10:00:00.000Z',
   updatedAt: '2026-04-01T10:00:00.000Z',
+  completedAt: null,
 };
 
 describe('todoReducer', () => {

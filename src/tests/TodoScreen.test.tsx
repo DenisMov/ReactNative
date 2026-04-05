@@ -1,7 +1,8 @@
 import React from 'react';
-import { fireEvent, render, waitFor } from '@testing-library/react-native';
+import { fireEvent, waitFor } from '@testing-library/react-native';
 import { TodoScreen } from '../features/todos/ui/TodoScreen/TodoScreen';
 import { useTodos, UseTodosResult } from '../features/todos/hooks/useTodos';
+import { renderWithProviders } from './testUtils';
 
 jest.mock('../features/todos/hooks/useTodos');
 
@@ -33,7 +34,7 @@ describe('TodoScreen', () => {
   it('renders empty state', () => {
     mockedUseTodos.mockReturnValue(createUseTodosState());
 
-    const { getByText } = render(<TodoScreen />);
+    const { getByText } = renderWithProviders(<TodoScreen />);
 
     expect(getByText('No tasks yet')).toBeTruthy();
     expect(
@@ -50,7 +51,7 @@ describe('TodoScreen', () => {
       }),
     );
 
-    const { getByTestId } = render(<TodoScreen />);
+    const { getByTestId } = renderWithProviders(<TodoScreen />);
 
     fireEvent.changeText(getByTestId('todo-form-input'), 'Buy milk');
     fireEvent.press(getByTestId('todo-form-submit'));
@@ -72,13 +73,14 @@ describe('TodoScreen', () => {
             completed: false,
             createdAt: '2026-04-01T10:00:00.000Z',
             updatedAt: '2026-04-01T10:00:00.000Z',
+            completedAt: null,
           },
         ],
         deleteTodo,
       }),
     );
 
-    const { getByTestId } = render(<TodoScreen />);
+    const { getByTestId } = renderWithProviders(<TodoScreen />);
 
     fireEvent.press(getByTestId('todo-delete-1'));
 
