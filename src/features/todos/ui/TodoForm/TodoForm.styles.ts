@@ -1,36 +1,36 @@
 import { StyleSheet } from 'react-native';
+import { colors, radius, spacing, typography } from '../../../../shared/theme';
 
 export const styles = StyleSheet.create({
   container: {
-    gap: 8,
-    marginBottom: 16,
+    gap: spacing.sm,
+    marginBottom: spacing.lg,
   },
   label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
+    ...typography.bodySemibold,
+    color: colors.textPrimary,
   },
   input: {
     minHeight: 48,
     borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
+    borderColor: colors.borderInput,
+    borderRadius: radius.md,
     paddingHorizontal: 14,
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    color: '#111827',
+    paddingVertical: spacing.md,
+    backgroundColor: colors.white,
+    color: colors.textPrimary,
   },
   errorText: {
-    fontSize: 13,
-    color: '#B91C1C',
+    ...typography.caption,
+    color: colors.dangerText,
   },
   button: {
     minHeight: 48,
-    borderRadius: 12,
-    backgroundColor: '#111827',
+    borderRadius: radius.md,
+    backgroundColor: colors.primary,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: spacing.lg,
   },
   buttonDisabled: {
     opacity: 0.5,
@@ -39,8 +39,7 @@ export const styles = StyleSheet.create({
     opacity: 0.85,
   },
   buttonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
+    ...typography.button,
+    color: colors.white,
   },
 });

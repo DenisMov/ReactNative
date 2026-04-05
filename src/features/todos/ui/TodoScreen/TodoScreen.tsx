@@ -9,9 +9,9 @@ import {
 import { useTodos } from '../../hooks/useTodos';
 import { TodoItem } from '../TodoItem/TodoItem';
 import { TodoForm } from '../TodoForm/TodoForm';
-import { Screen } from '../../../../shared/ui/Screen';
 import { useI18n } from '../../../../shared/i18n/useI18n';
 import { styles } from './TodoScreen.styles';
+import { Screen } from '../../../../shared/ui/Screen/Screen';
 
 export function TodoScreen(): React.JSX.Element {
   const {
