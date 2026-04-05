@@ -2,17 +2,22 @@ import React from 'react';
 import {
   KeyboardAvoidingView,
   Platform,
-  SafeAreaView,
   StatusBar,
   StyleSheet,
   View,
 } from 'react-native';
+import {
+  SafeAreaView,
+  useSafeAreaInsets,
+} from 'react-native-safe-area-context';
 
 type ScreenProps = {
   children: React.ReactNode;
 };
 
 export function Screen({ children }: ScreenProps): React.JSX.Element {
+  const insets = useSafeAreaInsets();
+
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" />
@@ -20,7 +25,7 @@ export function Screen({ children }: ScreenProps): React.JSX.Element {
         style={styles.flex}
         behavior={Platform.OS === 'ios' ? 'padding' : undefined}
       >
-        <View style={styles.content}>{children}</View>
+        <View style={[styles.content]}>{children}</View>
       </KeyboardAvoidingView>
     </SafeAreaView>
   );
@@ -37,6 +42,5 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 16,
-    paddingTop: 16,
   },
 });

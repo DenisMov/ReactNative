@@ -9,11 +9,12 @@ export function formatDisplayDate(isoString: string): string {
     return 'Unknown date';
   }
 
-  const datePart = date.toLocaleDateString();
-  const timePart = date.toLocaleTimeString([], {
+  return date.toLocaleString('uk-UA', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
     hour: '2-digit',
     minute: '2-digit',
+    hour12: false,
   });
-
-  return `${datePart} ${timePart}`;
 }

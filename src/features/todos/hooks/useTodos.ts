@@ -107,7 +107,8 @@ export function useTodos(): UseTodosResult {
           title: trimmedTitle,
           completed: false,
           createdAt: now,
-          updatedAt: now,
+          updatedAt: null,
+          completedAt: null,
         };
 
         const nextItems = [newTodo, ...state.items];
@@ -169,9 +170,12 @@ export function useTodos(): UseTodosResult {
       }
 
       return runProtectedAction('Authenticate to update a task', async () => {
+        const now = getNowIso();
+        const isCompleting = !existingTodo.completed;
         const updates = {
-          completed: !existingTodo.completed,
+          completed: isCompleting,
           updatedAt: getNowIso(),
+          completedAt: isCompleting ? now : null,
         };
 
         const nextItems = state.items.map(item =>

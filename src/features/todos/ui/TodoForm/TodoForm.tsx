@@ -1,5 +1,7 @@
 import React, { useState } from 'react';
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native';
+import { Pressable, Text, TextInput, View } from 'react-native';
+import { useI18n } from '../../../../shared/i18n/useI18n';
+import { styles } from './TodoForm.styles';
 
 type TodoFormProps = {
   onSubmit: (title: string) => Promise<boolean>;
@@ -10,6 +12,7 @@ export function TodoForm({
   onSubmit,
   disabled = false,
 }: TodoFormProps): React.JSX.Element {
+  const { t } = useI18n();
   const [value, setValue] = useState('');
   const [localError, setLocalError] = useState<string | null>(null);
 
@@ -17,7 +20,7 @@ export function TodoForm({
     const trimmedValue = value.trim();
 
     if (!trimmedValue) {
-      setLocalError('Title cannot be empty.');
+      setLocalError(t('errors.emptyTitle'));
       return;
     }
 
@@ -31,7 +34,7 @@ export function TodoForm({
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>New task</Text>
+      <Text style={styles.label}>{t('screen.newTask')}</Text>
 
       <TextInput
         testID="todo-form-input"
@@ -42,7 +45,7 @@ export function TodoForm({
             setLocalError(null);
           }
         }}
-        placeholder="Add a new task"
+        placeholder={t('screen.placeholder')}
         editable={!disabled}
         style={styles.input}
         autoCorrect={false}
@@ -67,53 +70,8 @@ export function TodoForm({
           pressed && !disabled && styles.buttonPressed,
         ]}
       >
-        <Text style={styles.buttonText}>Add</Text>
+        <Text style={styles.buttonText}>{t('actions.add')}</Text>
       </Pressable>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    gap: 8,
-    marginBottom: 16,
-  },
-  label: {
-    fontSize: 16,
-    fontWeight: '600',
-    color: '#111827',
-  },
-  input: {
-    minHeight: 48,
-    borderWidth: 1,
-    borderColor: '#D1D5DB',
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    paddingVertical: 12,
-    backgroundColor: '#FFFFFF',
-    color: '#111827',
-  },
-  errorText: {
-    fontSize: 13,
-    color: '#B91C1C',
-  },
-  button: {
-    minHeight: 48,
-    borderRadius: 12,
-    backgroundColor: '#111827',
-    alignItems: 'center',
-    justifyContent: 'center',
-    paddingHorizontal: 16,
-  },
-  buttonDisabled: {
-    opacity: 0.5,
-  },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-  buttonText: {
-    color: '#FFFFFF',
-    fontSize: 15,
-    fontWeight: '700',
-  },
-});

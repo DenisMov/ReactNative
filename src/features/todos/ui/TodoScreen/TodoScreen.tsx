@@ -3,14 +3,15 @@ import {
   ActivityIndicator,
   FlatList,
   Pressable,
-  StyleSheet,
   Text,
   View,
 } from 'react-native';
-import { useTodos } from '../hooks/useTodos';
-import { TodoItem } from './TodoItem';
-import { TodoForm } from './TodoForm';
-import { Screen } from '../../../shared/ui/Screen';
+import { useTodos } from '../../hooks/useTodos';
+import { TodoItem } from '../TodoItem/TodoItem';
+import { TodoForm } from '../TodoForm/TodoForm';
+import { Screen } from '../../../../shared/ui/Screen';
+import { useI18n } from '../../../../shared/i18n/useI18n';
+import { styles } from './TodoScreen.styles';
 
 export function TodoScreen(): React.JSX.Element {
   const {
@@ -25,17 +26,15 @@ export function TodoScreen(): React.JSX.Element {
     clearError,
     reload,
   } = useTodos();
-
+  const { t } = useI18n();
   const isDisabled = isLoading || isMutating;
 
   return (
     <Screen>
       <View style={styles.container}>
         <View style={styles.headerBlock}>
-          <Text style={styles.title}>Secured Todo App</Text>
-          <Text style={styles.subtitle}>
-            Authentication is required before add, update, and delete actions.
-          </Text>
+          <Text style={styles.title}>{t('screen.appTitle')}</Text>
+          <Text style={styles.subtitle}>{t('screen.appSubtitle')}</Text>
         </View>
 
         {error ? (
@@ -50,7 +49,9 @@ export function TodoScreen(): React.JSX.Element {
                   pressed && styles.buttonPressed,
                 ]}
               >
-                <Text style={styles.errorActionText}>Dismiss</Text>
+                <Text style={styles.errorActionText}>
+                  {t('actions.dismiss')}
+                </Text>
               </Pressable>
 
               <Pressable
@@ -62,7 +63,9 @@ export function TodoScreen(): React.JSX.Element {
                   pressed && styles.buttonPressed,
                 ]}
               >
-                <Text style={styles.errorActionText}>Reload</Text>
+                <Text style={styles.errorActionText}>
+                  {t('actions.reload')}
+                </Text>
               </Pressable>
             </View>
           </View>
@@ -74,7 +77,7 @@ export function TodoScreen(): React.JSX.Element {
           <View style={styles.statusRow}>
             <ActivityIndicator size="small" />
             <Text style={styles.statusText}>
-              Waiting for biometric confirmation...
+              {t('screen.waitingBiometric')}
             </Text>
           </View>
         ) : null}
@@ -82,13 +85,13 @@ export function TodoScreen(): React.JSX.Element {
         {isLoading ? (
           <View style={styles.centerState}>
             <ActivityIndicator size="large" />
-            <Text style={styles.stateText}>Loading saved tasks...</Text>
+            <Text style={styles.stateText}>{t('screen.loadingTasks')}</Text>
           </View>
         ) : items.length === 0 ? (
           <View style={styles.centerState}>
-            <Text style={styles.emptyTitle}>No tasks yet</Text>
+            <Text style={styles.emptyTitle}>{t('screen.noTasksTitle')}</Text>
             <Text style={styles.stateText}>
-              Add your first secured TODO using the form above.
+              {t('screen.noTasksDescription')}
             </Text>
           </View>
         ) : (
@@ -112,90 +115,3 @@ export function TodoScreen(): React.JSX.Element {
     </Screen>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    gap: 12,
-  },
-  headerBlock: {
-    gap: 6,
-    marginBottom: 4,
-  },
-  title: {
-    fontSize: 28,
-    lineHeight: 34,
-    fontWeight: '800',
-    color: '#111827',
-  },
-  subtitle: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#4B5563',
-  },
-  errorBanner: {
-    borderRadius: 14,
-    backgroundColor: '#FEF2F2',
-    borderWidth: 1,
-    borderColor: '#FECACA',
-    padding: 14,
-    gap: 10,
-  },
-  errorBannerText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#991B1B',
-    fontWeight: '500',
-  },
-  errorActions: {
-    flexDirection: 'row',
-    gap: 8,
-  },
-  errorActionButton: {
-    borderRadius: 10,
-    backgroundColor: '#FFFFFF',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
-    borderWidth: 1,
-    borderColor: '#FCA5A5',
-  },
-  errorActionText: {
-    fontSize: 13,
-    fontWeight: '700',
-    color: '#991B1B',
-  },
-  statusRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    gap: 10,
-  },
-  statusText: {
-    fontSize: 14,
-    color: '#374151',
-  },
-  centerState: {
-    flex: 1,
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 10,
-    paddingHorizontal: 16,
-  },
-  emptyTitle: {
-    fontSize: 18,
-    fontWeight: '700',
-    color: '#111827',
-  },
-  stateText: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#6B7280',
-    textAlign: 'center',
-  },
-  listContent: {
-    gap: 12,
-    paddingBottom: 24,
-  },
-  buttonPressed: {
-    opacity: 0.85,
-  },
-});

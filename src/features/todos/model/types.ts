@@ -3,7 +3,8 @@ export type Todo = {
   title: string;
   completed: boolean;
   createdAt: string;
-  updatedAt: string;
+  updatedAt: string | null;
+  completedAt: string | null;
 };
 
 export type TodosState = {

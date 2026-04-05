@@ -1,6 +1,6 @@
 import React from 'react';
 import { fireEvent, render, waitFor } from '@testing-library/react-native';
-import { TodoScreen } from '../features/todos/ui/TodoScreen';
+import { TodoScreen } from '../features/todos/ui/TodoScreen/TodoScreen';
 import { useTodos, UseTodosResult } from '../features/todos/hooks/useTodos';
 
 jest.mock('../features/todos/hooks/useTodos');
