@@ -1,22 +1,35 @@
 import React from 'react';
-import { KeyboardAvoidingView, Platform, StatusBar, View } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { styles } from './Screen.styles';
+import { colors } from '../../../shared/theme';
 
 type ScreenProps = {
   children: React.ReactNode;
 };
 
 export function Screen({ children }: ScreenProps): React.JSX.Element {
+  const insets = useSafeAreaInsets();
+
   return (
-    <SafeAreaView style={styles.safeArea}>
-      <StatusBar barStyle="dark-content" />
-      <KeyboardAvoidingView
-        style={styles.flex}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    <>
+      <StatusBar
+        barStyle="dark-content"
+        backgroundColor={colors.backgroundScreen}
+        translucent={false}
+      />
+
+      <View
+        style={[
+          styles.root,
+          {
+            paddingTop: insets.top,
+            paddingBottom: insets.bottom,
+          },
+        ]}
       >
-        <View style={[styles.content]}>{children}</View>
-      </KeyboardAvoidingView>
-    </SafeAreaView>
+        <View style={styles.content}>{children}</View>
+      </View>
+    </>
   );
 }
