@@ -28,6 +28,7 @@ export function TodoScreen(): React.JSX.Element {
   } = useTodos();
   const { t } = useI18n();
   const isDisabled = isLoading || isMutating;
+  const showReload = error === 'errors.loadTodos';
 
   return (
     <Screen>
@@ -39,7 +40,7 @@ export function TodoScreen(): React.JSX.Element {
 
         {error ? (
           <View style={styles.errorBanner}>
-            <Text style={styles.errorBannerText}>{error}</Text>
+            <Text style={styles.errorBannerText}>{t(error)}</Text>
 
             <View style={styles.errorActions}>
               <Pressable
@@ -53,20 +54,21 @@ export function TodoScreen(): React.JSX.Element {
                   {t('actions.dismiss')}
                 </Text>
               </Pressable>
-
-              <Pressable
-                onPress={() => {
-                  void reload();
-                }}
-                style={({ pressed }) => [
-                  styles.errorActionButton,
-                  pressed && styles.buttonPressed,
-                ]}
-              >
-                <Text style={styles.errorActionText}>
-                  {t('actions.reload')}
-                </Text>
-              </Pressable>
+              {showReload && (
+                <Pressable
+                  onPress={() => {
+                    void reload();
+                  }}
+                  style={({ pressed }) => [
+                    styles.errorActionButton,
+                    pressed && styles.buttonPressed,
+                  ]}
+                >
+                  <Text style={styles.errorActionText}>
+                    {t('actions.reload')}
+                  </Text>
+                </Pressable>
+              )}
             </View>
           </View>
         ) : null}

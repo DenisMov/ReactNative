@@ -1,4 +1,4 @@
-import { Todo } from '../../features/todos/model/types';
+import { Todo } from '../../features/todos/types';
 
 export type TodoMetaLabelKey = 'created' | 'updated' | 'completed';
 

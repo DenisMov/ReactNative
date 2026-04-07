@@ -1,10 +1,20 @@
-import { useCallback, useEffect, useReducer } from 'react';
+import { useCallback, useEffect } from 'react';
 import { requireBiometricAuth } from '../../auth/services/localAuth';
-import { todoReducer, initialTodosState } from '../model/todoReducer';
-import { Todo, TodosAction } from '../model/types';
+import {
+  addTodo as addTodoAction,
+  deleteTodo as deleteTodoAction,
+  hydrate,
+  setError,
+  setLoading,
+  setMutating,
+  updateTodo as updateTodoAction,
+} from '../model/todosSlice';
+import { Todo } from '../types';
 import { loadTodos, saveTodos } from '../storage/todoStorage';
 import { getNowIso } from '../../../shared/utils/date';
 import { generateId } from '../../../shared/utils/id';
+import { useAppDispatch, useAppSelector } from '../../../app/reduxHooks';
+import { useI18n } from '../../../shared/i18n/useI18n';
 
 function getErrorMessage(error: unknown, fallback: string): string {
   if (error instanceof Error && error.message.trim()) {
@@ -28,84 +38,77 @@ export type UseTodosResult = {
 };
 
 export function useTodos(): UseTodosResult {
-  const [state, dispatch] = useReducer(todoReducer, initialTodosState);
+  const dispatch = useAppDispatch();
+  const { t } = useI18n();
 
-  const persistAndDispatch = useCallback(
-    async (nextItems: Todo[], action: TodosAction): Promise<void> => {
-      await saveTodos(nextItems);
-      dispatch(action);
-    },
-    [],
+  const authAddPrompt = t('auth.add');
+  const authUpdatePrompt = t('auth.update');
+  const authDeletePrompt = t('auth.delete');
+
+  const { items, isLoading, isMutating, error } = useAppSelector(
+    state => state.todos,
   );
 
+  const persistItems = useCallback(async (nextItems: Todo[]): Promise<void> => {
+    await saveTodos(nextItems);
+  }, []);
+
   const reload = useCallback(async (): Promise<void> => {
-    dispatch({ type: 'setLoading', payload: true });
-    dispatch({ type: 'setError', payload: null });
+    dispatch(setLoading(true));
+    dispatch(setError(null));
 
     try {
-      const items = await loadTodos();
-      dispatch({ type: 'hydrate', payload: items });
+      const storedItems = await loadTodos();
+      dispatch(hydrate(storedItems));
     } catch (error) {
-      dispatch({
-        type: 'setError',
-        payload: getErrorMessage(error, 'Failed to load saved tasks.'),
-      });
+      dispatch(setError(getErrorMessage(error, 'errors.loadTodos')));
     } finally {
-      dispatch({ type: 'setLoading', payload: false });
+      dispatch(setLoading(false));
     }
-  }, []);
+  }, [dispatch]);
 
   useEffect(() => {
     void reload();
   }, [reload]);
-
-  /**
-   * Wraps actions with biometric authentication.
-   * Handles loading state, errors and auth result normalization.
-   */
 
   const runProtectedAction = useCallback(
     async (
       promptMessage: string,
       action: () => Promise<void>,
     ): Promise<boolean> => {
-      dispatch({ type: 'setError', payload: null });
-      dispatch({ type: 'setMutating', payload: true });
+      dispatch(setError(null));
+      dispatch(setMutating(true));
 
       try {
         const authResult = await requireBiometricAuth(promptMessage);
 
         if (!authResult.success) {
-          dispatch({ type: 'setError', payload: authResult.message });
+          dispatch(setError(authResult.message));
           return false;
         }
 
         await action();
         return true;
       } catch (error) {
-        dispatch({
-          type: 'setError',
-          payload: getErrorMessage(error, 'Failed to update tasks.'),
-        });
+        dispatch(setError(getErrorMessage(error, 'errors.updateTodos')));
         return false;
       } finally {
-        dispatch({ type: 'setMutating', payload: false });
+        dispatch(setMutating(false));
       }
     },
-    [],
+    [dispatch],
   );
 
-  // Creates a new todo after successful biometric auth
   const addTodo = useCallback(
     async (title: string): Promise<boolean> => {
       const trimmedTitle = title.trim();
 
       if (!trimmedTitle) {
-        dispatch({ type: 'setError', payload: 'Title cannot be empty.' });
+        dispatch(setError('errors.emptyTitle'));
         return false;
       }
 
-      return runProtectedAction('Authenticate to add a task', async () => {
+      return runProtectedAction(authAddPrompt, async () => {
         const now = getNowIso();
 
         const newTodo: Todo = {
@@ -117,120 +120,106 @@ export function useTodos(): UseTodosResult {
           completedAt: null,
         };
 
-        const nextItems = [newTodo, ...state.items];
+        const nextItems = [newTodo, ...items];
 
-        await persistAndDispatch(nextItems, {
-          type: 'add',
-          payload: newTodo,
-        });
+        await persistItems(nextItems);
+        dispatch(addTodoAction(newTodo));
       });
     },
-    [persistAndDispatch, runProtectedAction, state.items],
+    [dispatch, items, persistItems, runProtectedAction, authAddPrompt],
   );
 
-  // Persist updated todos to storage and sync reducer state
   const updateTodo = useCallback(
     async (id: string, title: string): Promise<boolean> => {
       const trimmedTitle = title.trim();
 
       if (!trimmedTitle) {
-        dispatch({ type: 'setError', payload: 'Title cannot be empty.' });
+        dispatch(setError('errors.emptyTitle'));
         return false;
       }
 
-      const existingTodo = state.items.find(item => item.id === id);
+      const existingTodo = items.find(item => item.id === id);
 
       if (!existingTodo) {
-        dispatch({ type: 'setError', payload: 'Task was not found.' });
+        dispatch(setError('errors.notFound'));
         return false;
       }
 
-      return runProtectedAction('Authenticate to update a task', async () => {
+      return runProtectedAction(authUpdatePrompt, async () => {
         const updates = {
           title: trimmedTitle,
           updatedAt: getNowIso(),
         };
 
-        const nextItems = state.items.map(item =>
+        const nextItems = items.map(item =>
           item.id === id ? { ...item, ...updates } : item,
         );
 
-        await persistAndDispatch(nextItems, {
-          type: 'update',
-          payload: {
-            id,
-            updates,
-          },
-        });
+        await persistItems(nextItems);
+        dispatch(updateTodoAction({ id, updates }));
       });
     },
-    [persistAndDispatch, runProtectedAction, state.items],
+    [dispatch, items, persistItems, runProtectedAction, authUpdatePrompt],
   );
 
   const toggleTodo = useCallback(
     async (id: string): Promise<boolean> => {
-      const existingTodo = state.items.find(item => item.id === id);
+      const existingTodo = items.find(item => item.id === id);
 
       if (!existingTodo) {
-        dispatch({ type: 'setError', payload: 'Task was not found.' });
+        dispatch(setError('errors.notFound'));
         return false;
       }
 
-      return runProtectedAction('Authenticate to update a task', async () => {
+      return runProtectedAction(authUpdatePrompt, async () => {
         const now = getNowIso();
         const isCompleting = !existingTodo.completed;
+
         const updates = {
           completed: isCompleting,
-          updatedAt: getNowIso(),
+          updatedAt: now,
           completedAt: isCompleting ? now : null,
         };
 
-        const nextItems = state.items.map(item =>
+        const nextItems = items.map(item =>
           item.id === id ? { ...item, ...updates } : item,
         );
 
-        await persistAndDispatch(nextItems, {
-          type: 'update',
-          payload: {
-            id,
-            updates,
-          },
-        });
+        await persistItems(nextItems);
+        dispatch(updateTodoAction({ id, updates }));
       });
     },
-    [persistAndDispatch, runProtectedAction, state.items],
+    [dispatch, items, persistItems, runProtectedAction, authUpdatePrompt],
   );
 
   const deleteTodo = useCallback(
     async (id: string): Promise<boolean> => {
-      const exists = state.items.some(item => item.id === id);
+      const exists = items.some(item => item.id === id);
 
       if (!exists) {
-        dispatch({ type: 'setError', payload: 'Task was not found.' });
+        dispatch(setError('errors.notFound'));
         return false;
       }
 
-      return runProtectedAction('Authenticate to delete a task', async () => {
-        const nextItems = state.items.filter(item => item.id !== id);
+      return runProtectedAction(authDeletePrompt, async () => {
+        const nextItems = items.filter(item => item.id !== id);
 
-        await persistAndDispatch(nextItems, {
-          type: 'delete',
-          payload: { id },
-        });
+        await persistItems(nextItems);
+        dispatch(deleteTodoAction({ id }));
       });
     },
-    [persistAndDispatch, runProtectedAction, state.items],
+    [dispatch, items, persistItems, runProtectedAction, authDeletePrompt],
   );
 
   const clearError = useCallback(() => {
-    dispatch({ type: 'setError', payload: null });
-  }, []);
+    dispatch(setError(null));
+  }, [dispatch]);
 
   return {
-    items: state.items,
-    isLoading: state.isLoading,
-    isMutating: state.isMutating,
-    error: state.error,
+    items,
+    isLoading,
+    isMutating,
+    error,
     addTodo,
     updateTodo,
     toggleTodo,

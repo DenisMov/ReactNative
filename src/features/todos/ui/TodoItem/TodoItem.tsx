@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Keyboard, Pressable, Text, TextInput, View } from 'react-native';
-import { Todo } from '../../model/types';
+import { Todo } from '../../types';
 import { formatDisplayDate } from '../../../../shared/utils/date';
 import { getTodoDisplayMeta } from '../../../../shared/utils/todoMeta';
 import { useI18n } from '../../../../shared/i18n/useI18n';

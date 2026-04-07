@@ -18,16 +18,16 @@ export type LocalAuthResult =
 function getFailureMessage(reason: LocalAuthFailureReason): string {
   switch (reason) {
     case 'no-hardware':
-      return 'Biometric authentication is not available on this device.';
+      return 'errors.noHardware';
     case 'not-enrolled':
-      return 'No biometric credentials are enrolled on this device.';
+      return 'errors.notEnrolled';
     case 'cancelled':
-      return 'Authentication was cancelled.';
+      return 'errors.cancelled';
     case 'failed':
-      return 'Authentication failed. Please try again.';
+      return 'errors.authFailed';
     case 'error':
     default:
-      return 'Something went wrong while checking biometrics.';
+      return 'errors.authError';
   }
 }
 

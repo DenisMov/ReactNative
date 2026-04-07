@@ -30,6 +30,19 @@ export const messages = {
     },
     errors: {
       emptyTitle: 'Title cannot be empty.',
+      loadTodos: 'Failed to load saved tasks.',
+      updateTodos: 'Failed to update tasks.',
+      notFound: 'Task was not found.',
+      noHardware: 'Biometric authentication is not available on this device.',
+      notEnrolled: 'No biometric credentials are enrolled on this device.',
+      cancelled: 'Authentication was cancelled.',
+      authFailed: 'Authentication failed. Please try again.',
+      authError: 'Something went wrong while checking biometrics.',
+    },
+    auth: {
+      add: 'Authenticate to add a task',
+      update: 'Authenticate to update a task',
+      delete: 'Authenticate to delete a task',
     },
   },
   ua: {
@@ -60,6 +73,19 @@ export const messages = {
     },
     errors: {
       emptyTitle: 'Назва не може бути порожньою.',
+      loadTodos: 'Не вдалося завантажити збережені задачі.',
+      updateTodos: 'Не вдалося оновити задачі.',
+      notFound: 'Задачу не знайдено.',
+      noHardware: 'Біометрична автентифікація недоступна на цьому пристрої.',
+      notEnrolled: 'На цьому пристрої не налаштовано біометричні дані.',
+      cancelled: 'Автентифікацію скасовано.',
+      authFailed: 'Автентифікація не вдалася. Спробуйте ще раз.',
+      authError: 'Під час перевірки біометрії сталася помилка.',
+    },
+    auth: {
+      add: 'Підтвердіть дію для додавання задачі',
+      update: 'Підтвердіть дію для оновлення задачі',
+      delete: 'Підтвердіть дію для видалення задачі',
     },
   },
 } as const;

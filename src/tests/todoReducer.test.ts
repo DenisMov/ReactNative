@@ -2,7 +2,7 @@ import {
   initialTodosState,
   todoReducer,
 } from '../features/todos/model/todoReducer';
-import { Todo } from '../features/todos/model/types';
+import { Todo } from '../features/todos/types';
 
 const baseTodo: Todo = {
   id: '1',

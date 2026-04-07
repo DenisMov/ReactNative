@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { STORAGE_KEYS } from '../../../shared/constants/storageKeys';
-import { Todo } from '../model/types';
+import { Todo } from '../types';
 
 /**
  * Runtime type guard to validate unknown data from storage.
